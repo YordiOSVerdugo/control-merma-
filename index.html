@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Merma - D/10</title>
+  <style>
+    * {margin: 0; padding: 0; box-sizing: border-box;}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #faf7f2;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #0f0f0f;
+      border-radius: 20px;
+      padding: 30px;
+      border: 1px solid rgba(250, 247, 242, 0.1);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+    .fecha {
+      font-size: 0.9rem;
+      color: rgba(250, 247, 242, 0.6);
+      margin-bottom: 30px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(250, 247, 242, 0.8);
+    }
+    .prod-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .prod {
+      flex: 1;
+      padding: 12px;
+      background: rgba(250, 247, 242, 0.05);
+      border: 2px solid rgba(250, 247, 242, 0.2);
+      border-radius: 10px;
+      color: #faf7f2;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .prod:hover {
+      background: rgba(250, 247, 242, 0.1);
+      border-color: rgba(250, 247, 242, 0.4);
+    }
+    .prod.activo {
+      background: #faf7f2;
+      color: #0f0f0f;
+      border-color: #faf7f2;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      background: rgba(250, 247, 242, 0.05);
+      border: 1px solid rgba(250, 247, 242, 0.2);
+      border-radius: 10px;
+      color: #faf7f2;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    input::placeholder {
+      color: rgba(250, 247, 242, 0.4);
+    }
+    input:focus {
+      outline: none;
+      border-color: rgba(250, 247, 242, 0.5);
+      background: rgba(250, 247, 242, 0.08);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #faf7f2;
+      color: #0f0f0f;
+      border: none;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(250, 247, 242, 0.2);
+    }
+    .lista-pesos {
+      background: rgba(250, 247, 242, 0.05);
+      border: 1px solid rgba(250, 247, 242, 0.2);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .peso-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: rgba(250, 247, 242, 0.08);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+    .peso-item button {
+      width: auto;
+      padding: 6px 12px;
+      background: rgba(220, 38, 38, 0.6);
+      font-size: 0.85rem;
+    }
+    .peso-item button:hover {
+      background: rgba(220, 38, 38, 0.9);
+    }
+    .totales {
+      background: rgba(34, 197, 94, 0.1);
+      border: 2px solid rgba(34, 197, 94, 0.3);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .total-fila {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .total-fila:last-child {
+      margin-bottom: 0;
+      font-size: 1.1rem;
+      color: #22c55e;
+    }
+    .resultado {
+      background: rgba(250, 247, 242, 0.08);
+      border: 2px solid rgba(250, 247, 242, 0.3);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+    .resultado.visible {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .error {
+      color: #fca5a5;
+      font-weight: 600;
+      padding: 10px;
+      background: rgba(220, 38, 38, 0.1);
+      border-radius: 8px;
+    }
+    .fila {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(250, 247, 242, 0.1);
+    }
+    .fila:last-child {
+      border-bottom: none;
+    }
+    .fila span:first-child {
+      font-weight: 600;
+    }
+    .fila span:last-child {
+      color: #22c55e;
+      font-weight: 700;
+    }
+    .acciones {
+      display: flex;
+      gap: 10px;
+    }
+    .borrar {
+      background: rgba(220, 38, 38, 0.3) !important;
+      color: #fca5a5 !important;
+      flex: 0.5;
+    }
+    .borrar:hover {
+      background: rgba(220, 38, 38, 0.6) !important;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Control de Merma</h1>
+  <div class="fecha" id="fecha"></div>
+
+  <div class="section">
+    <div class="section-title">Producto</div>
+    <div class="prod-group">
+      <button class="prod activo" data-nombre="Res" data-factor="30" onclick="elegir(this)">Carne de Res</button>
+      <button class="prod" data-nombre="Puerco" data-factor="50" onclick="elegir(this)">Puerco</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Agregar Pesos</div>
+    <div class="input-group">
+      <input type="number" id="peso" placeholder="Peso de la caja (libras)" step="0.1">
+    </div>
+    <button onclick="agregarPeso()">Agregar peso</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Pesos Registrados</div>
+    <div class="lista-pesos" id="lista-pesos">
+      <p style="text-align: center; color: rgba(250, 247, 242, 0.4); margin: 20px 0;">Sin pesos aún</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Bastas Totales</div>
+    <div class="input-group">
+      <input type="number" id="bastas" placeholder="Cantidad total de bastas" step="0.1">
+    </div>
+    <button onclick="calcular()">Calcular merma</button>
+  </div>
+
+  <div id="resultado" class="resultado"></div>
+
+  <div class="acciones">
+    <button onclick="copiarResumen()" style="flex: 1;">Copiar resumen</button>
+    <button class="borrar" onclick="limpiar()">Borrar día</button>
+  </div>
+</div>
+
+<script>
+let producto = {nombre: "Res", factor: 30};
+let pesos = [];
+
+document.getElementById("fecha").textContent =
+  new Date().toLocaleDateString("es-MX", {weekday: "short", day: "numeric", month: "short"});
+
+function elegir(el) {
+  document.querySelectorAll(".prod").forEach(p => p.classList.remove("activo"));
+  el.classList.add("activo");
+  producto = {nombre: el.dataset.nombre, factor: parseFloat(el.dataset.factor)};
+}
+
+function agregarPeso() {
+  const peso = parseFloat(document.getElementById("peso").value);
+  const resultado = document.getElementById("resultado");
+
+  if (isNaN(peso) || peso <= 0) {
+    resultado.innerHTML = '<div class="error">Escribe un peso válido.</div>';
+    resultado.classList.add("visible");
+    return;
+  }
+
+  pesos.push(peso);
+  document.getElementById("peso").value = "";
+  document.getElementById("peso").focus();
+  pintarPesos();
+  resultado.classList.remove("visible");
+}
+
+function pintarPesos() {
+  const lista = document.getElementById("lista-pesos");
+  if (pesos.length === 0) {
+    lista.innerHTML = '<p style="text-align: center; color: rgba(250, 247, 242, 0.4); margin: 20px 0;">Sin pesos aún</p>';
+    return;
+  }
+
+  const totalPeso = pesos.reduce((s, p) => s + p, 0);
+  lista.innerHTML = pesos.map((p, i) =>
+    '<div class="peso-item"><span>Caja ' + (i + 1) + ': ' + p.toFixed(1) + ' lb</span>' +
+    '<button onclick="quitarPeso(' + i + ')">Quitar</button></div>'
+  ).join("") +
+  '<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(250, 247, 242, 0.2);">' +
+  '<div class="total-fila"><span>Total:</span><span>' + totalPeso.toFixed(1) + ' lb</span></div></div>';
+}
+
+function quitarPeso(index) {
+  pesos.splice(index, 1);
+  pintarPesos();
+}
+
+function calcular() {
+  const bastas = parseFloat(document.getElementById("bastas").value);
+  const resultado = document.getElementById("resultado");
+
+  if (pesos.length === 0) {
+    resultado.innerHTML = '<div class="error">Agrega al menos un peso primero.</div>';
+    resultado.classList.add("visible");
+    return;
+  }
+
+  if (isNaN(bastas) || bastas < 0) {
+    resultado.innerHTML = '<div class="error">Escribe la cantidad de bastas.</div>';
+    resultado.classList.add("visible");
+    return;
+  }
+
+  const totalPeso = pesos.reduce((s, p) => s + p, 0);
+  const util = bastas * producto.factor;
+
+  if (util > totalPeso) {
+    resultado.innerHTML = '<div class="error">⚠ El peso de las bastas (' + util.toFixed(1) +
+      ' lb) es mayor que el peso total (' + totalPeso.toFixed(1) + ' lb).</div>';
+    resultado.classList.add("visible");
+    return;
+  }
+
+  const merma = totalPeso - util;
+
+  resultado.innerHTML =
+    '<div class="fila"><span>Producto</span><span>' + producto.nombre + '</span></div>' +
+    '<div class="fila"><span>Peso total</span><span>' + totalPeso.toFixed(1) + ' lb</span></div>' +
+    '<div class="fila"><span>Bastas</span><span>' + bastas + ' × ' + producto.factor + ' lb</span></div>' +
+    '<div class="fila"><span>Peso útil</span><span>' + util.toFixed(1) + ' lb</span></div>' +
+    '<div class="fila"><span style="color: #fca5a5;">Merma</span><span style="color: #fca5a5; font-size: 1.2rem;">' + merma.toFixed(1) + ' lb</span></div>';
+  resultado.classList.add("visible");
+}
+
+function copiarResumen() {
+  if (pesos.length === 0) return;
+  const totalPeso = pesos.reduce((s, p) => s + p, 0);
+  const bastas = parseFloat(document.getElementById("bastas").value) || 0;
+  const util = bastas * producto.factor;
+  const merma = totalPeso - util;
+  const fecha = new Date().toLocaleDateString("es-MX");
+
+  let txt = "CONTROL DE MERMA D/10 — " + fecha + "\n";
+  txt += "Producto: " + producto.nombre + "\n";
+  txt += "Pesos: " + pesos.map(p => p.toFixed(1)).join(", ") + "\n";
+  txt += "Peso total: " + totalPeso.toFixed(1) + " lb\n";
+  txt += "Bastas: " + bastas + " × " + producto.factor + " lb = " + util.toFixed(1) + " lb\n";
+  txt += "Merma total: " + merma.toFixed(1) + " lb";
+
+  navigator.clipboard.writeText(txt).then(() => alert("Resumen copiado ✓"));
+}
+
+function limpiar() {
+  if (confirm("¿Borrar todos los registros?")) {
+    pesos = [];
+    document.getElementById("bastas").value = "";
+    document.getElementById("peso").value = "";
+    pintarPesos();
+    document.getElementById("resultado").classList.remove("visible");
+  }
+}
+</script>
+
+</body>
+</html>
